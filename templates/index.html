@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <title>Users</title>
+
+    <!-- Bootstrap -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    />
+</head>
+<body class="container py-4">
+
+<h1 class="mb-4">Users</h1>
+
+<!-- ===== Форма добавления ===== -->
+<form id="userForm" class="mb-4">
+    <div class="row g-2">
+        <div class="col">
+            <input class="form-control" id="name" placeholder="Name" required />
+        </div>
+        <div class="col">
+            <input class="form-control" id="email" placeholder="Email" required />
+        </div>
+        <div class="col-auto">
+            <button class="btn btn-primary">Add</button>
+        </div>
+    </div>
+</form>
+
+<div id="message"></div>
+
+<!-- ===== Таблица ===== -->
+<table class="table table-striped" id="usersTable">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<!-- ===== Модалка ===== -->
+<div class="modal fade" id="userModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">User details</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+const tableBody = document.querySelector("#usersTable tbody");
+const messageDiv = document.getElementById("message");
+
+// =========================
+// загрузка пользователей
+// =========================
+async function loadUsers() {
+    const res = await fetch("/users");
+    const users = await res.json();
+
+    tableBody.innerHTML = "";
+
+    users.forEach(user => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${user.id}</td>
+            <td class="user-link" data-id="${user.id}" style="cursor:pointer">
+                ${user.name}
+            </td>
+            <td>${user.email}</td>
+        `;
+        tableBody.appendChild(tr);
+    });
+}
+
+// =========================
+// клик по пользователю
+// =========================
+tableBody.addEventListener("click", async (e) => {
+    if (!e.target.classList.contains("user-link")) return;
+
+    const id = e.target.dataset.id;
+    const res = await fetch(`/users/${id}`);
+    const user = await res.json();
+
+    document.getElementById("modalBody").innerHTML = `
+        <p><b>ID:</b> ${user.id}</p>
+        <p><b>Name:</b> ${user.name}</p>
+        <p><b>Email:</b> ${user.email}</p>
+    `;
+
+    const modal = new bootstrap.Modal(document.getElementById("userModal"));
+    modal.show();
+});
+
+// =========================
+// добавление пользователя
+// =========================
+document.getElementById("userForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+
+    const res = await fetch("/users", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({name, email})
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+        messageDiv.innerHTML =
+            `<div class="alert alert-success">User added</div>`;
+        loadUsers();
+        e.target.reset();
+    } else {
+        messageDiv.innerHTML =
+            `<div class="alert alert-danger">${data.error}</div>`;
+    }
+});
+
+// initial load
+loadUsers();
+</script>
+
+</body>
+</html>
