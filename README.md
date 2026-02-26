@@ -1,6 +1,6 @@
 # Flask Users App
 
-![Tests](https://github.com/<YOUR_USERNAME>/<YOUR_REPO>/actions/workflows/tests.yml/badge.svg)
+![Tests](https://github.com/fshakrun/FlaskUsersApp/actions/workflows/tests.yml/badge.svg)
 ![Coverage](https://img.shields.io/badge/coverage-98%25-brightgreen)
 ![Pytest](https://img.shields.io/badge/tests-pytest-orange)
 ![Allure](https://img.shields.io/badge/report-allure-purple)
