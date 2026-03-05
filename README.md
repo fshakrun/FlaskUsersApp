@@ -6,6 +6,7 @@
 ![Allure](https://img.shields.io/badge/report-allure-purple)
 
 Простое веб‑приложение на Flask для управления пользователями.
+Для связи fshakrun@gmail.com
 
 ---
 
